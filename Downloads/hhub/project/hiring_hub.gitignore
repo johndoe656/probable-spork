@@ -1,0 +1,12 @@
+# --- CRITICAL SECRETS ---
+# These MUST be ignored even if the repo is private
+firebaseConfig.js
+secrets.json
+.env
+
+# Add the file that holds your Formspree/Email setup if separate
+formspree_config.js 
+
+# --- COMMON EXCLUSIONS ---
+/node_modules
+.DS_Store

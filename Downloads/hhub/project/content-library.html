@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Content Prompts - Hiring Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .font-inter { font-family: 'Inter', sans-serif; }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+
+        .prompt-card {
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-card:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .authenticity-meter {
+            height: 6px;
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 25%, #eab308 50%, #84cc16 75%, #10b981 100%);
+            border-radius: 3px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+        }
+
+        .tab-active {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+        }
+
+        .tab-inactive {
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter text-slate-800">
+
+    <!-- Header -->
+    <div class="header-gradient text-white px-6 py-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold">TikTok Content Prompt Library</h1>
+                    <p class="text-blue-100 text-sm mt-1">AI-ready scripts for authentic recruitment videos</p>
+                </div>
+                <a href="/" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    ← Back to Careers
+                </a>
+            </div>
+
+            <p class="text-blue-50 text-sm max-w-2xl">
+                Every prompt below is designed for realistic, AI-generated TikTok videos that resonate with applicants. Each includes specific visual direction, target demographics, and expected conversion rates.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-6 py-8">
+
+        <!-- Category Tabs -->
+        <div class="flex flex-wrap gap-2 mb-8 pb-4 border-b border-gray-200">
+            <button onclick="filterCategory('all')" class="tab-active px-4 py-2 rounded-lg font-semibold text-sm">
+                All Prompts
+            </button>
+            <button onclick="filterCategory('income')" class="tab-inactive px-4 py-2 rounded-lg font-semibold text-sm">
+                💰 Income Focus
+            </button>
+            <button onclick="filterCategory('lifestyle')" class="tab-inactive px-4 py-2 rounded-lg font-semibold text-sm">
+                🏡 Lifestyle
+            </button>
+            <button onclick="filterCategory('experience')" class="tab-inactive px-4 py-2 rounded-lg font-semibold text-sm">
+                🌟 No Experience
+            </button>
+            <button onclick="filterCategory('legitimacy')" class="tab-inactive px-4 py-2 rounded-lg font-semibold text-sm">
+                ✅ Legitimacy
+            </button>
+            <button onclick="filterCategory('fomo')" class="tab-inactive px-4 py-2 rounded-lg font-semibold text-sm">
+                ⚡ FOMO & Urgency
+            </button>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-lg border border-gray-100">
+                <div class="text-2xl font-bold text-blue-600" id="totalCount">20</div>
+                <div class="text-xs text-slate-600 mt-1">Total Prompts</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-100">
+                <div class="text-2xl font-bold text-green-600">5</div>
+                <div class="text-xs text-slate-600 mt-1">Categories</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-100">
+                <div class="text-2xl font-bold text-purple-600">8-10</div>
+                <div class="text-xs text-slate-600 mt-1">Avg Authenticity</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-100">
+                <div class="text-2xl font-bold text-orange-600">14-21%</div>
+                <div class="text-xs text-slate-600 mt-1">Avg Conversion</div>
+            </div>
+        </div>
+
+        <!-- Prompts Grid -->
+        <div id="promptsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Populated by JavaScript -->
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { contentPrompts, getAllCategories } from './src/contentPrompts.js'
+
+        let currentFilter = 'all'
+        let allPrompts = []
+
+        const initializePrompts = () => {
+            allPrompts = [
+                ...contentPrompts.incomeCategory.map(p => ({ ...p, categoryId: 'income' })),
+                ...contentPrompts.lifestyleCategory.map(p => ({ ...p, categoryId: 'lifestyle' })),
+                ...contentPrompts.noExperienceCategory.map(p => ({ ...p, categoryId: 'experience' })),
+                ...contentPrompts.legitimacyCategory.map(p => ({ ...p, categoryId: 'legitimacy' })),
+                ...contentPrompts.fomoCategoryL.map(p => ({ ...p, categoryId: 'fomo' }))
+            ]
+
+            document.getElementById('totalCount').textContent = allPrompts.length
+
+            renderPrompts()
+        }
+
+        window.filterCategory = (category) => {
+            currentFilter = category
+
+            document.querySelectorAll('button').forEach((btn, i) => {
+                if (i === 0 && category === 'all') {
+                    btn.classList.add('tab-active')
+                    btn.classList.remove('tab-inactive')
+                } else if (i > 0) {
+                    const btnCategory = ['income', 'lifestyle', 'experience', 'legitimacy', 'fomo'][i - 1]
+                    if (btnCategory === category) {
+                        btn.classList.add('tab-active')
+                        btn.classList.remove('tab-inactive')
+                    } else {
+                        btn.classList.remove('tab-active')
+                        btn.classList.add('tab-inactive')
+                    }
+                } else {
+                    btn.classList.remove('tab-active')
+                    btn.classList.add('tab-inactive')
+                }
+            })
+
+            if (category !== 'all') {
+                document.querySelector('button:first-child').classList.remove('tab-active')
+                document.querySelector('button:first-child').classList.add('tab-inactive')
+            }
+
+            renderPrompts()
+        }
+
+        const renderPrompts = () => {
+            const filtered = currentFilter === 'all'
+                ? allPrompts
+                : allPrompts.filter(p => p.categoryId === currentFilter)
+
+            const html = filtered.map((prompt, i) => {
+                const conversionPercent = (prompt.expectedConversion * 100).toFixed(0)
+                const categoryEmojis = {
+                    'income': '💰',
+                    'lifestyle': '🏡',
+                    'experience': '🌟',
+                    'legitimacy': '✅',
+                    'fomo': '⚡'
+                }
+
+                return `
+                    <div class="prompt-card p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-lg">${categoryEmojis[prompt.categoryId]}</span>
+                                    <span class="category-badge bg-blue-50 text-blue-700">${prompt.category}</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-800 leading-tight">"${prompt.hook}"</h3>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 my-4 pb-4 border-b border-slate-100">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-600 mb-1">Video Script:</p>
+                                <p class="text-sm text-slate-700 leading-relaxed">${prompt.script}</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                    <p class="text-xs text-slate-600 font-semibold">Duration</p>
+                                    <p class="text-slate-800 font-medium">${prompt.duration}s</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-600 font-semibold">Target Audience</p>
+                                    <p class="text-slate-800 font-medium text-xs">${prompt.target}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 mb-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <p class="text-xs font-semibold text-slate-600">Authenticity Score</p>
+                                    <p class="text-xs font-bold text-green-600">${prompt.authenticity}/10</p>
+                                </div>
+                                <div class="authenticity-meter" style="width: ${(prompt.authenticity / 10) * 100}%"></div>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <p class="text-xs text-slate-600"><strong>${conversionPercent}%</strong> expected conversion</p>
+                                <span class="text-xs font-medium text-blue-600">Est. ROI</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-1 mb-4">
+                            ${prompt.bestFor.map(shift => `<span class="bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded">${shift}</span>`).join('')}
+                        </div>
+
+                        <button onclick="copyPrompt('${i}')" class="copy-btn w-full text-white py-2 px-4 rounded-lg font-semibold text-sm hover:shadow-lg">
+                            📋 Copy Script
+                        </button>
+                    </div>
+                `
+            }).join('')
+
+            document.getElementById('promptsContainer').innerHTML = html || '<p class="col-span-full text-center text-slate-500">No prompts found</p>'
+        }
+
+        window.copyPrompt = (index) => {
+            const prompt = allPrompts[index]
+            const text = `HOOK: "${prompt.hook}"
+
+SCRIPT: ${prompt.script}
+
+TARGET: ${prompt.target}
+DURATION: ${prompt.duration}s
+AUTHENTICITY: ${prompt.authenticity}/10
+EXPECTED CONVERSION: ${(prompt.expectedConversion * 100).toFixed(0)}%
+BEST FOR: ${prompt.bestFor.join(', ')}`
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Script copied to clipboard!')
+            }).catch(() => {
+                alert('Error copying to clipboard')
+            })
+        }
+
+        initializePrompts()
+    </script>
+
+</body>
+</html>

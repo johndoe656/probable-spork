@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Data Entry - Part-Time & Full-Time Positions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .font-inter { font-family: 'Inter', sans-serif; }
+        
+        .bg-gradient-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+        
+        .apply-btn {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+        }
+        
+        .shift-card {
+            transition: all 0.3s ease;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .shift-card:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            border-left-color: #059669;
+        }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(3px);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.9375rem;
+        }
+        
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-popup {
+            animation: slideInUp 0.4s ease-out;
+        }
+    </style>
+    
+    <script>
+        window.selectedShift = '';
+        
+        window.openApplicationModal = function(shift) {
+            const modal = document.getElementById('applicationModal');
+            const title = document.getElementById('modalShiftTitle');
+            const hiddenInput = document.getElementById('selectedShiftInput');
+
+            window.selectedShift = shift;
+            hiddenInput.value = shift;
+            
+            document.getElementById('status-message').classList.add('hidden');
+            document.getElementById('application-form').reset();
+            
+            if(modal && title) {
+                title.textContent = shift;
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        window.closeApplicationModal = function() {
+            const modal = document.getElementById('applicationModal');
+            if(modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.closeNotification = function() {
+            const notification = document.getElementById('responseNotification');
+            if(notification) {
+                notification.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const notification = document.getElementById('responseNotification');
+                if(notification) {
+                    notification.classList.remove('hidden');
+                }
+            }, 10000);
+        });
+    </script>
+</head>
+<body class="bg-gray-50 font-inter text-slate-800">
+
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl">
+
+        <!-- Quick Access Navigation -->
+        <div class="bg-slate-900 text-white px-6 py-2 flex gap-2 justify-center text-xs">
+            <a href="/analytics.html" class="hover:text-blue-200 font-medium transition">📊 Analytics</a>
+            <span class="text-slate-500">•</span>
+            <a href="/content-library.html" class="hover:text-blue-200 font-medium transition">🎬 Content Library</a>
+        </div>
+
+        <!-- Header -->
+        <div class="bg-gradient-header text-white px-6 py-8">
+            <div class="text-center">
+                <div class="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg mb-3">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-sm font-semibold">Verified Secure Employer</span>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Remote Data Entry<br/>Immediate Openings</h1>
+                <p class="text-blue-100 text-sm">Part-Time & Full-Time • Flexible 4-hour shifts</p>
+            </div>
+        </div>
+
+        <!-- Key Benefits Grid -->
+        <div class="px-6 py-6 bg-gradient-to-b from-blue-50 to-white">
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                    <div class="text-2xl mb-1">💵</div>
+                    <p class="text-xs text-slate-600 font-medium">Hourly Rate</p>
+                    <p class="text-sm font-bold text-green-700">$18-23/hour</p>
+                </div>
+                
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                    <div class="text-2xl mb-1">⏰</div>
+                    <p class="text-xs text-slate-600 font-medium">Shift Length</p>
+                    <p class="text-sm font-bold text-slate-800">4 hours each</p>
+                </div>
+                
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                    <div class="text-2xl mb-1">🏠</div>
+                    <p class="text-xs text-slate-600 font-medium">Work Location</p>
+                    <p class="text-sm font-bold text-slate-800">100% Remote</p>
+                </div>
+                
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                    <div class="text-2xl mb-1">👶</div>
+                    <p class="text-xs text-slate-600 font-medium">Environment</p>
+                    <p class="text-sm font-bold text-slate-800">Family Friendly</p>
+                </div>
+            </div>
+
+            <!-- Benefits Section -->
+            <div class="bg-white border border-blue-200 rounded-lg p-4 mb-4">
+                <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                    </svg>
+                    <span>Employee Benefits Include:</span>
+                </h3>
+                <div class="grid grid-cols-1 gap-2 text-xs text-slate-700">
+                    <div class="flex items-start">
+                        <span class="text-green-600 mr-2">✓</span>
+                        <span><strong>Health & Dental Coverage</strong> (Full-time employees)</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-green-600 mr-2">✓</span>
+                        <span><strong>Paid Training</strong> with compensation</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-green-600 mr-2">✓</span>
+                        <span><strong>Biweekly Direct Deposit</strong> or Credit Card payment</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-green-600 mr-2">✓</span>
+                        <span><strong>Paid Time Off</strong> & Holidays</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-green-600 mr-2">✓</span>
+                        <span><strong>401(k) Plan</strong> (Full-time eligible)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p class="text-sm text-green-900">
+                    <span class="font-semibold">Background noise accepted.</span> We understand you're working from home—family sounds are normal and expected.
+                </p>
+            </div>
+        </div>
+
+        <!-- HIPAA Compliance Section -->
+        <div class="px-6 pb-6">
+            <div class="bg-blue-50 border-l-4 border-blue-600 rounded-lg p-4 mb-6">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <h3 class="text-sm font-bold text-blue-900 mb-1">Compliance & Security Commitment</h3>
+                        <p class="text-xs text-blue-800 leading-relaxed"><strong>HIPAA Compliant Data Handling:</strong> All information gathered is handled in strict compliance with HIPAA standards for protected health information.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-lg font-bold text-slate-800 mb-3">Ideal For:</h2>
+            <div class="space-y-2 text-sm mb-6">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-slate-700">Parents seeking income while caring for children</span>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-slate-700">Retirees supplementing fixed income</span>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-slate-700">Individuals with disabilities seeking flexible work</span>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-slate-700">Anyone seeking full-time or part-time remote work</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TikTok Social Proof Section -->
+        <div class="px-6 py-6 bg-gradient-to-r from-blue-50 to-blue-100/50">
+            <h3 class="text-center font-bold text-slate-800 mb-3">Trusted by Our Community</h3>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-white rounded-lg p-3">
+                    <p class="text-sm font-bold text-blue-600">2,847+</p>
+                    <p class="text-xs text-slate-600">Active Workers</p>
+                </div>
+                <div class="bg-white rounded-lg p-3">
+                    <p class="text-sm font-bold text-green-600">$18-23/hr</p>
+                    <p class="text-xs text-slate-600">Competitive Pay</p>
+                </div>
+                <div class="bg-white rounded-lg p-3">
+                    <p class="text-sm font-bold text-purple-600">47 Spots</p>
+                    <p class="text-xs text-slate-600">Available Now</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Shifts -->
+        <div class="px-6 pb-8">
+            <h2 class="text-xl font-bold text-slate-800 mb-1 text-center">Available Shifts</h2>
+            <p class="text-sm text-slate-600 text-center mb-2">4-hour shifts • Work part-time (1-5 shifts/week) or full-time (8+ shifts/week)</p>
+            <p class="text-xs text-center text-green-600 font-semibold mb-5">⚡ Hiring closes Friday - limited spots this week</p>
+            
+            <!-- Morning Shifts -->
+            <div class="mb-6">
+                <h3 class="text-base font-bold text-slate-700 mb-3 flex items-center">
+                    <span class="text-xl mr-2">🌅</span>
+                    Morning Shifts
+                </h3>
+                
+                <div class="space-y-3">
+                    <div class="shift-card bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-bold text-lg text-slate-800">5am - 9am EST</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Early hours before family wakes</p>
+                            </div>
+                            <span class="badge bg-blue-100 text-blue-700">Open</span>
+                        </div>
+                        <button onclick="window.openApplicationModal('Morning: 5am-9am EST')" 
+                                class="apply-btn w-full text-white font-semibold py-2.5 rounded-lg mt-2">
+                            Apply for This Shift
+                        </button>
+                    </div>
+                    
+                    <div class="shift-card bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-bold text-lg text-slate-800">9am - 1pm EST</p>
+                                <p class="text-xs text-slate-500 mt-0.5">During school hours</p>
+                            </div>
+                            <span class="badge bg-green-100 text-green-700">High Demand</span>
+                        </div>
+                        <button onclick="window.openApplicationModal('Morning: 9am-1pm EST')" 
+                                class="apply-btn w-full text-white font-semibold py-2.5 rounded-lg mt-2">
+                            Apply for This Shift
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Afternoon Shifts -->
+            <div class="mb-6">
+                <h3 class="text-base font-bold text-slate-700 mb-3 flex items-center">
+                    <span class="text-xl mr-2">☀️</span>
+                    Afternoon Shifts
+                </h3>
+                
+                <div class="space-y-3">
+                    <div class="shift-card bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-bold text-lg text-slate-800">1pm - 5pm EST</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Flexible midday hours</p>
+                            </div>
+                            <span class="badge bg-blue-100 text-blue-700">Open</span>
+                        </div>
+                        <button onclick="window.openApplicationModal('Afternoon: 1pm-5pm EST')" 
+                                class="apply-btn w-full text-white font-semibold py-2.5 rounded-lg mt-2">
+                            Apply for This Shift
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evening Shifts -->
+            <div class="mb-6">
+                <h3 class="text-base font-bold text-slate-700 mb-3 flex items-center">
+                    <span class="text-xl mr-2">🌙</span>
+                    Evening Shifts
+                </h3>
+                
+                <div class="space-y-3">
+                    <div class="shift-card bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-bold text-lg text-slate-800">5pm - 9pm EST</p>
+                                <p class="text-xs text-slate-500 mt-0.5">After dinner hours</p>
+                            </div>
+                            <span class="badge bg-blue-100 text-blue-700">Open</span>
+                        </div>
+                        <button onclick="window.openApplicationModal('Evening: 5pm-9pm EST')" 
+                                class="apply-btn w-full text-white font-semibold py-2.5 rounded-lg mt-2">
+                            Apply for This Shift
+                        </button>
+                    </div>
+                    
+                    <div class="shift-card bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-bold text-lg text-slate-800">9pm - 1am EST</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Late night availability</p>
+                            </div>
+                            <span class="badge bg-purple-100 text-purple-700">Limited</span>
+                        </div>
+                        <button onclick="window.openApplicationModal('Evening: 9pm-1am EST')" 
+                                class="apply-btn w-full text-white font-semibold py-2.5 rounded-lg mt-2">
+                            Apply for This Shift
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requirements -->
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
+                <h3 class="font-bold text-sm text-slate-800 mb-2">Basic Requirements:</h3>
+                <ul class="text-xs text-slate-600 space-y-1.5">
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>Computer, laptop, or smartphone with internet</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>Basic typing or data entry skills</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>Reliable availability during chosen shifts</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>Must be 18+ years old</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Why Apply -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-blue-900 mb-1">Why Join Our Team?</p>
+                        <ul class="text-xs text-blue-800 space-y-1">
+                            <li>• No experience required—paid training provided</li>
+                            <li>• Biweekly payments via direct deposit or credit card</li>
+                            <li>• Choose between part-time or full-time schedules</li>
+                            <li>• Weekend shifts available for extra income</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Response Notification -->
+    <div id="responseNotification" class="hidden fixed bottom-4 left-4 right-4 z-50 max-w-md mx-auto">
+        <div class="notification-popup bg-white rounded-lg shadow-2xl border border-gray-200 p-4">
+            <div class="flex items-start justify-between">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-semibold text-slate-900">Application Review Timeline</p>
+                        <p class="text-xs text-slate-600 mt-1">We review all applications daily. You'll receive a response within 24-48 hours via email or WhatsApp.</p>
+                    </div>
+                </div>
+                <button onclick="window.closeNotification()" class="ml-3 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION MODAL -->
+    <div id="applicationModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="modal-overlay fixed inset-0" onclick="window.closeApplicationModal()"></div>
+        
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto transform transition-all max-h-[90vh] flex flex-col">
+                
+                <!-- Header -->
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-blue-50 to-green-50 rounded-t-2xl flex-shrink-0">
+                    <h2 class="text-lg font-bold text-slate-800">Quick Application</h2>
+                    <button onclick="window.closeApplicationModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                </div>
+
+                <!-- Scrollable Form Content -->
+                <div class="px-6 py-6 overflow-y-auto flex-grow">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                        <p class="text-xs text-blue-900">
+                            <span class="font-semibold">Position Applied For:</span>
+                            <span id="modalShiftTitle" class="block text-sm font-bold text-blue-700 mt-1"></span>
+                        </p>
+                    </div>
+
+                    <form id="application-form" class="space-y-4" method="POST" action="https://formspree.io/f/mblnwpvd">
+                        
+                        <input type="text" name="_gotcha" style="display:none" />
+                        <input type="hidden" id="selectedShiftInput" name="selectedShift" value="">
+
+                        <!-- Personal Information -->
+                        <div>
+                            <label class="block text-left text-sm font-medium text-slate-700 mb-1.5">Full Name *</label>
+                            <input type="text" name="fullName" required placeholder="First and Last Name" class="form-input">
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div>
+                            <label class="block text-left text-sm font-medium text-slate-700 mb-1.5">Email Address *</label>
+                            <input type="email" name="_replyto" required placeholder="your.email@example.com" class="form-input">
+                        </div>
+
+                        <div>
+                            <label class="block text-left text-sm font-medium text-slate-700 mb-1.5">Phone Number (WhatsApp Preferred) *</label>
+                            <input type="tel" name="phone" required placeholder="+1 (555) 000-0000" class="form-input">
+                        </div>
+                        
+                        <!-- Location (General) -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-left text-sm font-medium text-slate-700 mb-1.5">City *</label>
+                                <input type="text" name="city" required placeholder="City" class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-left text-sm font-medium text-slate-700 mb-1.5">State *</label>
+                                <input type="text" name="state" required placeholder="State" class="form-input">
+                            </div>
+                        </div>
+
+                        <!-- Employment Details -->
+                        <div>
+                            <label class="block text-left text-sm font-medium text-slate-700 mb-1.5">Work Experience Level *</label>
+                            <select name="experience" class="form-input" required>
+                                <option value="" disabled selected>Select your experience</option>
+                                <option value="No Experience">No Experience (Training Provided)</option>
+                                <option value="Entry Level">Entry Level (Less than 1 year)</option>
+                                <option value="Intermediate">Intermediate (1-3 years)</option>
+                                <option value="Experienced">Experienced (3+ years)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-left text-sm font-medium text-slate-700 mb-1.5">Desired Employment Type *</label>
+                            <select name="employmentType" class="form-input" required>
+                                <option value="" disabled selected>Select employment type</option>
+                                <option value="Part-Time">Part-Time (4-20 hours/week)</option>
+                                <option value="Full-Time">Full-Time (32+ hours/week)</option>
+                                <option value="Flexible">Flexible (Open to either)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-left text-sm font-medium text-slate-700 mb-1.5">Available Start Date *</label>
+                            <input type="date" name="startDate" required class="form-input">
+                        </div>
+
+                        <!-- Resume/CV Upload (Optional) -->
+                        <div>
+                            <label class="block text-left text-sm font-medium text-slate-700 mb-1.5">Resume/CV or LinkedIn Profile (Optional)</label>
+                            <input type="url" name="resumeLink" placeholder="Paste link to resume or LinkedIn" class="form-input">
+                            <p class="text-xs text-slate-500 mt-1 text-left">If sharing a document, ensure link permissions are enabled</p>
+                        </div>
+
+                        <!-- Legal Authorization -->
+                        <div class="border-t border-gray-200 pt-4 mt-4">
+                            <div class="bg-slate-50 rounded-lg p-3">
+                                <label class="flex items-start text-xs text-slate-700 cursor-pointer">
+                                    <input type="checkbox" name="workAuthorization" required class="mt-0.5 mr-2 flex-shrink-0">
+                                    <span>I confirm that I am 18+ years old and legally authorized to work in the United States *</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="source" value="TikTok Remote Employment Funnel">
+                        <input type="hidden" name="_subject" value="NEW APPLICATION: Remote Data Entry Position">
+                        
+                        <div id="status-message" class="text-center mt-4 text-sm font-medium hidden"></div>
+
+                        <button type="submit" id="submit-button" class="w-full apply-btn text-white py-3.5 rounded-lg font-bold text-base shadow-lg mt-6">
+                            <span id="button-text">Submit Application</span>
+                            <span id="loading-spinner" class="hidden inline-block animate-spin h-5 w-5 border-4 border-white border-t-transparent rounded-full"></span>
+                        </button>
+                        
+                        <p class="text-xs text-center text-slate-500 mt-3">🔒 Your information is encrypted and HIPAA compliant</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Integration -->
+    <script type="module">
+        import { submitApplication } from './src/supabase.js'
+
+        const form = document.getElementById('application-form');
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = document.getElementById('button-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const statusMessage = document.getElementById('status-message');
+
+        const setLoading = (isLoading) => {
+            submitButton.disabled = isLoading;
+            loadingSpinner.classList.toggle('hidden', !isLoading);
+            buttonText.classList.toggle('hidden', isLoading);
+        };
+
+        const showStatus = (message, isSuccess = true) => {
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden', 'text-red-500', 'text-green-500');
+            statusMessage.classList.add(isSuccess ? 'text-green-500' : 'text-red-500');
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setLoading(true);
+            showStatus('', false);
+
+            const formData = new FormData(form);
+            const data = {
+                fullName: formData.get('fullName'),
+                email: formData.get('_replyto'),
+                phone: formData.get('phone'),
+                city: formData.get('city'),
+                state: formData.get('state'),
+                experience: formData.get('experience'),
+                employmentType: formData.get('employmentType'),
+                startDate: formData.get('startDate'),
+                resumeLink: formData.get('resumeLink'),
+                workAuthorization: formData.get('workAuthorization') === 'on',
+                selectedShift: formData.get('selectedShift')
+            };
+
+            try {
+                const result = await submitApplication(data);
+
+                setLoading(false);
+
+                if (result.success) {
+                    showStatus('✅ Application submitted successfully! Check your email within 24-48 hours.', true);
+                    form.reset();
+                    window.selectedShift = '';
+                    setTimeout(window.closeApplicationModal, 3000);
+                } else {
+                    showStatus(`❌ Error: ${result.error}`, false);
+                }
+            } catch (error) {
+                setLoading(false);
+                showStatus('❌ Submission error. Please check your connection and try again.', false);
+                console.error('Form error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
