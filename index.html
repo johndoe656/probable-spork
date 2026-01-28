@@ -649,7 +649,7 @@
 
         const showStatus = (message, isSuccess = true) => {
             statusMessage.textContent = message;
-            statusMessage.classList.remove('hidden', 'text-red-500', 'text-green-500');
+           statusMessage.classList.remove('hidden', 'text-red-500', 'text-green-500');
             statusMessage.classList.add(isSuccess ? 'text-green-500' : 'text-red-500');
         };
 
@@ -685,5 +685,37 @@
             }
         });
     </script>
+    <script>
+  const form = document.querySelector('form'); // This selects your form
+
+  form.onsubmit = async (e) => {
+    e.preventDefault(); // Stops the page from refreshing
+    
+    const button = form.querySelector('button[type="submit"]');
+    const originalText = button.textContent;
+    button.textContent = "Sending..."; // Feedback for the user
+    button.disabled = true;
+
+    try {
+      const response = await fetch("YOUR_MAKE_WEBHOOK_URL_HERE", {
+        method: "POST",
+        body: new FormData(form)
+      });
+
+      if (response.ok) {
+        alert("Application Sent Successfully!");
+        form.reset();
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Connection error.");
+    } finally {
+      button.textContent = originalText;
+      button.disabled = false;
+    }
+  };
+</script>
 </body>
 </html>
