@@ -241,13 +241,13 @@
                     <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    <span class="text-slate-700">Parents seeking income while caring for children</span>
+                    <span class="text-slate-700">Anyone seeking full-time or part-time remote work</span>
                 </div>
                 <div class="flex items-start">
                     <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    <span class="text-slate-700">Retirees supplementing fixed income</span>
+                    <span class="text-slate-700">Parents seeking income while caring for children</span>
                 </div>
                 <div class="flex items-start">
                     <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -259,7 +259,7 @@
                     <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    <span class="text-slate-700">Anyone seeking full-time or part-time remote work</span>
+                    <span class="text-slate-700">Retirees supplementing fixed income</span>
                 </div>
             </div>
         </div>
@@ -653,69 +653,40 @@
             statusMessage.classList.add(isSuccess ? 'text-green-500' : 'text-red-500');
         };
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            setLoading(true);
-            showStatus('', false);
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    showStatus('', false);
 
-            const formData = new FormData(form);
-
-            try {
-                // Submit to make.com
-                const response = await fetch(form.action, {
-                    method: form.method,
-                    body: formData,
-                    headers: { 'Accept': 'application/json' }
-                });
-
-                setLoading(false);
-
-                if (response.ok) {
-                    showStatus('✅ Application submitted successfully! Check your email for next steps.', true);
-                    form.reset();
-                    window.selectedShift = '';
-                    setTimeout(window.closeApplicationModal, 3000);
-                } else {
-                    showStatus('❌ Submission error. Please try again.', false);
-                }
-            } catch (error) {
-                setLoading(false);
-                showStatus('❌ Submission error. Please check your connection and try again.', false);
-                console.error('Form error:', error);
-            }
-        });
-    </script>
-    <script>
-  const form = document.querySelector('form'); // This selects your form
-
-  form.onsubmit = async (e) => {
-    e.preventDefault(); // Stops the page from refreshing
-    
-    const button = form.querySelector('button[type="submit"]');
-    const originalText = button.textContent;
-    button.textContent = "Sending..."; // Feedback for the user
-    button.disabled = true;
+    const formData = new FormData(form);
 
     try {
-      const response = await fetch("YOUR_MAKE_WEBHOOK_URL_HERE", {
-        method: "POST",
-        body: new FormData(form)
-      });
+        // Submit to Make.com
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: { 
+                'Accept': 'application/json'
+            }
+        });
 
-      if (response.ok) {
-        alert("Application Sent Successfully!");
-        form.reset();
-      } else {
-        alert("Something went wrong. Please try again.");
-      }
+        setLoading(false);
+
+        // Make.com always returns success if webhook receives data
+        if (response.ok || response.status === 200) {
+            showStatus('✅ Application submitted successfully! Check your email for next steps.', true);
+            form.reset();
+            window.selectedShift = '';
+            setTimeout(window.closeApplicationModal, 3000);
+        } else {
+            showStatus('❌ Submission error. Please try again.', false);
+        }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Connection error.");
-    } finally {
-      button.textContent = originalText;
-      button.disabled = false;
+        setLoading(false);
+        showStatus('❌ Network error. Please check your connection and try again.', false);
+        console.error('Form error:', error);
     }
-  };
-</script>
+});
+    </script>
 </body>
 </html>
