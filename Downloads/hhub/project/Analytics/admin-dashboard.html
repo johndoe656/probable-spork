@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Analytics - Hiring Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .font-inter { font-family: 'Inter', sans-serif; }
+
+        .dashboard-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        #loginScreen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+
+        #dashboardContent {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter text-slate-800">
+
+    <!-- Login Screen -->
+    <div id="loginScreen">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-800 mb-2">Admin Access</h1>
+                <p class="text-slate-600 text-sm">Analytics Dashboard</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Access Code</label>
+                    <input 
+                        type="password" 
+                        id="accessCode" 
+                        placeholder="Enter access code"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition"
+                        autocomplete="off"
+                    />
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+                >
+                    Access Dashboard
+                </button>
+                
+                <p id="errorMessage" class="text-red-500 text-sm text-center hidden">Invalid access code</p>
+            </form>
+            
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <p class="text-xs text-center text-slate-500">
+                    🔒 This page is restricted to authorized personnel only
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Content (Hidden until login) -->
+    <div id="dashboardContent">
+        <!-- Header -->
+        <div class="header-gradient text-white px-6 py-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold">Analytics Dashboard</h1>
+                        <p class="text-blue-100 text-sm mt-1">Real-time recruitment funnel metrics • <span id="lastUpdated">Loading...</span></p>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="/" target="_blank" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                            View Careers Page
+                        </a>
+                        <button onclick="logout()" class="bg-red-500/80 hover:bg-red-600 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-6 py-8">
+
+            <!-- Auto-Refresh Indicator -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-6 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <p class="text-sm text-green-800 font-medium">Live updates enabled • Refreshes every 30 seconds</p>
+                </div>
+                <button onclick="manualRefresh()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
+                    Refresh Now
+                </button>
+            </div>
+
+            <!-- Key Metrics Row -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="metric-card p-6">
+                    <div class="stat-label">Total Applications</div>
+                    <div class="stat-number" id="totalApps">0</div>
+                    <p class="text-xs text-slate-500 mt-2">All time</p>
+                </div>
+
+                <div class="metric-card p-6">
+                    <div class="stat-label">Conversion Rate</div>
+                    <div class="stat-number" id="conversionRate">0%</div>
+                    <p class="text-xs text-slate-500 mt-2">Click to submit</p>
+                </div>
+
+                <div class="metric-card p-6">
+                    <div class="stat-label">Avg Quality Score</div>
+                    <div class="stat-number" id="qualityScore">0/10</div>
+                    <p class="text-xs text-slate-500 mt-2">Applicant experience level</p>
+                </div>
+
+                <div class="metric-card p-6">
+                    <div class="stat-label">Top Source</div>
+                    <div class="stat-number text-lg" id="topSource">—</div>
+                    <p class="text-xs text-slate-500 mt-2">Campaign driving most apps</p>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+                <!-- Applications by Shift -->
+                <div class="metric-card p-6">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4">Applications by Shift</h2>
+                    <div class="chart-container">
+                        <canvas id="shiftChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Applications by Source -->
+                <div class="metric-card p-6">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4">Applications by Source</h2>
+                    <div class="chart-container">
+                        <canvas id="sourceChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Experience Level Distribution -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+                <div class="metric-card p-6">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4">Experience Distribution</h2>
+                    <div class="chart-container">
+                        <canvas id="experienceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="metric-card p-6">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4">Employment Type Preferences</h2>
+                    <div class="chart-container">
+                        <canvas id="employmentChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Top Locations -->
+            <div class="metric-card p-6 mb-8">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4">Top 10 Geographic Locations</h2>
+                <div id="locationsTable" class="space-y-2">
+                    <div class="text-slate-500 text-sm">Loading location data...</div>
+                </div>
+            </div>
+
+            <!-- Recent Applications Table -->
+            <div class="metric-card p-6">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4">Recent Applications</h2>
+                <div class="overflow-x-auto">
+                    <table id="applicationsTable" class="w-full text-sm">
+                        <thead class="border-b border-slate-200">
+                            <tr>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Name</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Email</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Phone</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Shift</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Experience</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Type</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Location</th>
+                                <th class="text-left py-3 px-4 font-semibold text-slate-700">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="8" class="py-4 px-4 text-center text-slate-500">Loading applications...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './src/supabase.js'
+        import { Analytics } from './src/analytics.js'
+
+        // Access code - Change this to your desired password
+        const ACCESS_CODE = 'admin001';  // ⚠️ CHANGE THIS PASSWORD!
+
+        let shiftChart, sourceChart, experienceChart, employmentChart;
+        let refreshInterval;
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const code = document.getElementById('accessCode').value;
+            
+            if (code === ACCESS_CODE) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+                sessionStorage.setItem('adminAuth', 'true');
+                loadDashboard();
+                startAutoRefresh();
+            } else {
+                document.getElementById('errorMessage').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('errorMessage').classList.add('hidden');
+                }, 3000);
+            }
+        });
+
+        // Logout functionality
+        window.logout = () => {
+            sessionStorage.removeItem('adminAuth');
+            location.reload();
+        };
+
+        // Check if already logged in
+        if (sessionStorage.getItem('adminAuth') === 'true') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+            loadDashboard();
+            startAutoRefresh();
+        }
+
+        const loadDashboard = async () => {
+            try {
+                const { data: applications, error } = await supabase
+                    .from('applications')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+
+                if (error) throw error
+
+                document.getElementById('lastUpdated').textContent = `Updated at ${new Date().toLocaleTimeString()}`;
+
+                if (!applications || applications.length === 0) {
+                    document.getElementById('tableBody').innerHTML = '<tr><td colspan="8" class="py-4 px-4 text-center text-slate-500">No applications yet</td></tr>'
+                    return
+                }
+
+                updateMetrics(applications)
+                renderCharts(applications)
+                renderLocationsTable(applications)
+                renderApplicationsTable(applications)
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error)
+                alert('Error loading analytics data')
+            }
+        }
+
+        const updateMetrics = (applications) => {
+            const summary = Analytics.getMetricsSummary(applications)
+
+            document.getElementById('totalApps').textContent = summary.totalApplications
+            document.getElementById('qualityScore').textContent = summary.avgQualityScore + '/10'
+
+            const sources = Object.entries(summary.byStatus)
+            const topStatus = sources.length > 0 ? sources[0][0] : 'N/A'
+            document.getElementById('topSource').textContent = topStatus
+
+            const conversionEstimate = Math.min(100, (summary.totalApplications / 500 * 100)).toFixed(1)
+            document.getElementById('conversionRate').textContent = conversionEstimate + '%'
+        }
+
+        const renderCharts = (applications) => {
+            const shiftData = Analytics.aggregateByShift(applications)
+            const sourceData = Analytics.aggregateBySource(applications)
+
+            const experienceData = Analytics.getMetricsSummary(applications).byExperience
+            const employmentData = Analytics.getMetricsSummary(applications).byEmploymentType
+
+            // Destroy existing charts
+            if (shiftChart) shiftChart.destroy();
+            if (sourceChart) sourceChart.destroy();
+            if (experienceChart) experienceChart.destroy();
+            if (employmentChart) employmentChart.destroy();
+
+            // Shift Chart
+            const shiftCtx = document.getElementById('shiftChart').getContext('2d')
+            shiftChart = new Chart(shiftCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.values(shiftData).map(s => s.shift.split(': ')[1]).sort(),
+                    datasets: [{
+                        label: 'Applications',
+                        data: Object.values(shiftData).map(s => s.count).sort(() => -1),
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            })
+
+            // Source Chart
+            const sourceCtx = document.getElementById('sourceChart').getContext('2d')
+            sourceChart = new Chart(sourceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(sourceData),
+                    datasets: [{
+                        data: Object.values(sourceData).map(s => s.total),
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            })
+
+            // Experience Chart
+            const experienceCtx = document.getElementById('experienceChart').getContext('2d')
+            experienceChart = new Chart(experienceCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(experienceData),
+                    datasets: [{
+                        label: 'Count',
+                        data: Object.values(experienceData),
+                        backgroundColor: '#10b981',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            })
+
+            // Employment Chart
+            const employmentCtx = document.getElementById('employmentChart').getContext('2d')
+            employmentChart = new Chart(employmentCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(employmentData),
+                    datasets: [{
+                        data: Object.values(employmentData),
+                        backgroundColor: ['#0ea5e9', '#06b6d4', '#14b8a6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            })
+        }
+
+        const renderLocationsTable = (applications) => {
+            const locationData = Analytics.aggregateByLocation(applications)
+            const topLocations = Analytics.getTopLocations(locationData, 10)
+
+            const html = topLocations.map((loc, i) => `
+                <div class="flex items-center justify-between py-3 px-4 border-b border-slate-100 hover:bg-slate-50">
+                    <div>
+                        <p class="font-medium text-slate-800">${i + 1}. ${loc.location}</p>
+                        <p class="text-xs text-slate-500 mt-1">${loc.count} application${loc.count !== 1 ? 's' : ''}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        ${loc.preferences.includes('Full-Time') ? '<span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">Full-Time</span>' : ''}
+                        ${loc.preferences.includes('Part-Time') ? '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Part-Time</span>' : ''}
+                    </div>
+                </div>
+            `).join('')
+
+            document.getElementById('locationsTable').innerHTML = html
+        }
+
+        const renderApplicationsTable = (applications) => {
+            const recentApps = applications.slice(0, 50)
+
+            const html = recentApps.map(app => `
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <td class="py-3 px-4">${app.full_name}</td>
+                    <td class="py-3 px-4 text-sm">${app.email}</td>
+                    <td class="py-3 px-4 text-sm">${app.phone}</td>
+                    <td class="py-3 px-4 text-sm">${app.selected_shift}</td>
+                    <td class="py-3 px-4 text-sm">${app.experience}</td>
+                    <td class="py-3 px-4 text-sm">${app.employment_type}</td>
+                    <td class="py-3 px-4 text-sm">${app.city}, ${app.state}</td>
+                    <td class="py-3 px-4 text-xs text-slate-500">${Analytics.formatDate(app.created_at)}</td>
+                </tr>
+            `).join('')
+
+            document.getElementById('tableBody').innerHTML = html
+        }
+
+        window.manualRefresh = () => {
+            loadDashboard();
+        }
+
+        const startAutoRefresh = () => {
+            refreshInterval = setInterval(loadDashboard, 30000); // Refresh every 30 seconds
+        }
+    </script>
+
+</body>
+</html>
